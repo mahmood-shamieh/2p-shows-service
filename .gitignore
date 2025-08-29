@@ -1,0 +1,70 @@
+### Java ###
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+*.log
+hs_err_pid*
+
+### Spring Boot ###
+/target/
+/build/
+/out/
+/bin/
+/dependency-reduced-pom.xml
+
+### Maven ###
+.mvn/
+!/.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper/maven-wrapper.properties
+.mvn/wrapper/maven-wrapper-downloader.java
+.mvn/timing.properties
+mvnw
+mvnw.cmd
+
+### Gradle ###
+.gradle/
+/build/
+/!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+gradlew
+gradlew.bat
+
+### IDEs ###
+# IntelliJ IDEA
+.idea/
+*.iws
+*.ipr
+*.iml
+
+# Eclipse
+.project
+.classpath
+.settings/
+.apt_generated/
+.factorypath
+.springBeans
+.sts4-cache/
+
+# VS Code
+.vscode/
+
+### OS files ###
+.DS_Store
+Thumbs.db
+
+### Logs & Temp ###
+*.log
+*.tmp
+*.bak
+*.swp
+*.swo
+
+### Test outputs ###
+/test-output/
+/surefire-reports/
+/jacoco.exec
+
+
+
