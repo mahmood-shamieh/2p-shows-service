@@ -9,4 +9,7 @@ public interface SeasonRepo extends JpaRepository<SeasonEntity,Long> {
     public List<SeasonEntity> findByShowId(
             Long showId
     );
+    public List<SeasonEntity> findByShowIdAndActivatedTrue(
+            Long showId
+    );
 }

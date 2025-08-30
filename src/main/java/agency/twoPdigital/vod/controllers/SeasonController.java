@@ -64,11 +64,20 @@ public class SeasonController {
                 .build());
     }
 
-    @Operation(summary = "Get all shows", description = "Fetch all shows from the database")
+    @Operation(summary = "Get all seasons", description = "Fetch all seasons from the database")
     @GetMapping(value = "/getAll/{showId}")
     public ResponseEntity<ApiResponse<List<SeasonModel>>> getAllSeasonBYShowId(@PathVariable(name = "showId") Long showId) throws NotFoundException {
         return ResponseEntity.ok(ApiResponse.<List<SeasonModel>>builder()
                 .body(seasonService.getAllSeasonByShowId(showId))
+                .statusCode(HttpStatus.OK.value())
+                .message("Success")
+                .build());
+    }
+    @Operation(summary = "Get all seasons (ViewAction)", description = "Fetch all seasons from the database")
+    @GetMapping(value = "/view/getAll/{showId}")
+    public ResponseEntity<ApiResponse<List<SeasonModel>>> getAllSeasonBYShowIdForView(@PathVariable(name = "showId") Long showId) throws NotFoundException {
+        return ResponseEntity.ok(ApiResponse.<List<SeasonModel>>builder()
+                .body(seasonService.getAllSeasonByShowIdForView(showId))
                 .statusCode(HttpStatus.OK.value())
                 .message("Success")
                 .build());

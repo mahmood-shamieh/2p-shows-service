@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     public ApiResponse<Object> handleNotFoundException(NotFoundException ex, HttpServletRequest request) {
         logService.log(request,ex);
         return ApiResponse.builder()
-                .statusCode(404)
+                .statusCode(HttpStatus.NOT_FOUND.value())
                 .message(ex.getMessage())
                 .build();
     }
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler {
     public ApiResponse<Object> handleCreateShowException(Exception ex,HttpServletRequest request) {
         logService.log(request,ex);
         return ApiResponse.builder()
-                .statusCode(500)
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(ex.getMessage())
                 .build();
     }
@@ -46,7 +46,7 @@ public class GlobalExceptionHandler {
     public ApiResponse<Object> handleRequestBodyCheckException(Exception ex,HttpServletRequest request) {
         logService.log(request,ex);
         return ApiResponse.builder()
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .message("Request Body Should Be Provided")
                 .build();
     }
@@ -62,7 +62,7 @@ public class GlobalExceptionHandler {
         return ApiResponse.<Map>builder()
                 .body(errors)
                 .message("Kindly Check The Errors")
-                .statusCode(400)
+                .statusCode(HttpStatus.BAD_REQUEST.value())
                 .build();
     }
 
@@ -71,7 +71,7 @@ public class GlobalExceptionHandler {
     public ApiResponse<Object> handleUnknownException(Exception ex,HttpServletRequest request) {
         logService.log(request,ex);
         return ApiResponse.builder()
-                .statusCode(500)
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(ex.getMessage())
                 .build();
     }

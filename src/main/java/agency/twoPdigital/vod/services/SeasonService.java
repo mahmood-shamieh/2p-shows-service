@@ -41,6 +41,12 @@ public class SeasonService {
                 .toList();
 
     }
+    public List<SeasonModel> getAllSeasonByShowIdForView(Long showId) {
+        return seasonRepo.findByShowIdAndActivatedTrue(showId).stream()
+                .map(seasonMapper::toModel)
+                .toList();
+
+    }
 
     public SeasonModel updateSeason(Long id, SeasonModel seasonModel) throws NotFoundException, UpdateSeasonException {
         SeasonEntity existingEntity = seasonRepo.findById(id)
