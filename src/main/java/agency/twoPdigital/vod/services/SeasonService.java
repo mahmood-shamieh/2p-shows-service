@@ -96,24 +96,19 @@ public class SeasonService {
 
     private List<EpisodeModel> fetchEpisodesForSeason(Long seasonId) {
         try {
-            // Make GET request to the Episode service
             Mono<List<EpisodeModel>> responseMono = episodeWebClient.get()
                     .uri(serviceConfigurations.getEpisodeService().getGetAllEpisodeBySeasonId(), seasonId)
                     .retrieve()
                     .bodyToMono(ApiResponse.class)
                     .map(apiResponse -> {
-                        // Cast the body to List<EpisodeModel>
                         Object body = apiResponse.getBody();
                         if (body instanceof List<?> list) {
                             return (List<EpisodeModel>) list;
                         }
                         return Collections.<EpisodeModel>emptyList();
                     });
-
-            return responseMono.block(); // blocking here for simplicity
+            return responseMono.block();
         } catch (Exception e) {
-            // Log and return empty list if the call fails
-            e.printStackTrace();
             return Collections.emptyList();
         }
     }
