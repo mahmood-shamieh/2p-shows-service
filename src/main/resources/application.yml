@@ -11,3 +11,9 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: ${SHOW_QUERY:true}
+
+services:
+  episodeService:
+    baseUrl: ${EPISODE_SERVICE_BASE_URL:http://localhost:8083}
+    timeOut: 10
+    getAllEpisodeBySeasonId: "/episodes/view/season/{seasonId}"

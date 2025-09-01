@@ -1,23 +1,46 @@
 package agency.twoPdigital.vod.services;
 
+import agency.twoPdigital.vod.config.ServiceConfigurations;
 import agency.twoPdigital.vod.entities.SeasonEntity;
 import agency.twoPdigital.vod.excpetions.CreateSeasonException;
 import agency.twoPdigital.vod.excpetions.NotFoundException;
 import agency.twoPdigital.vod.excpetions.UpdateSeasonException;
 import agency.twoPdigital.vod.mappers.SeasonMapper;
+import agency.twoPdigital.vod.models.ApiResponse;
+import agency.twoPdigital.vod.models.EpisodeModel;
 import agency.twoPdigital.vod.models.SeasonModel;
 import agency.twoPdigital.vod.repos.SeasonRepo;
+import agency.twoPdigital.vod.utils.QualifierKeyWord;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+
 public class SeasonService {
     private final SeasonRepo seasonRepo;
     private final SeasonMapper seasonMapper;
+    private final ServiceConfigurations serviceConfigurations;
+    private final WebClient episodeWebClient;
+
+    @Autowired
+    public SeasonService(
+            SeasonRepo seasonRepo
+            , SeasonMapper seasonMapper
+            , ServiceConfigurations serviceConfigurations
+            , @Qualifier(QualifierKeyWord.EPISODE_WEB_CLIENT) WebClient episodeWebClient) {
+        this.seasonRepo = seasonRepo;
+        this.seasonMapper = seasonMapper;
+        this.serviceConfigurations = serviceConfigurations;
+        this.episodeWebClient = episodeWebClient;
+    }
 
     public SeasonModel createNewSeason(SeasonModel seasonModel) throws CreateSeasonException {
         SeasonEntity entity = seasonMapper.toEntity(seasonModel);
@@ -41,12 +64,20 @@ public class SeasonService {
                 .toList();
 
     }
-    public List<SeasonModel> getAllSeasonByShowIdForView(Long showId) {
-        return seasonRepo.findByShowIdAndActivatedTrue(showId).stream()
-                .map(seasonMapper::toModel)
-                .toList();
 
+    public List<SeasonModel> getAllSeasonByShowIdForView(Long showId) {
+        List<SeasonEntity> seasonEntities = seasonRepo.findByShowIdAndActivatedTrue(showId);
+        List<SeasonModel> seasonModels = seasonEntities.stream().map(seasonMapper::toModel).toList();
+
+        return seasonModels.stream()
+                .map(seasonModel -> {
+                    List<EpisodeModel> episodes = fetchEpisodesForSeason(seasonModel.getId());
+                    seasonModel.setEpisodeList(episodes);
+                    return seasonModel;
+                })
+                .toList();
     }
+
 
     public SeasonModel updateSeason(Long id, SeasonModel seasonModel) throws NotFoundException, UpdateSeasonException {
         SeasonEntity existingEntity = seasonRepo.findById(id)
@@ -61,5 +92,29 @@ public class SeasonService {
             throw new UpdateSeasonException(e);
         }
         return seasonMapper.toModel(updatedEntity);
+    }
+
+    private List<EpisodeModel> fetchEpisodesForSeason(Long seasonId) {
+        try {
+            // Make GET request to the Episode service
+            Mono<List<EpisodeModel>> responseMono = episodeWebClient.get()
+                    .uri(serviceConfigurations.getEpisodeService().getGetAllEpisodeBySeasonId(), seasonId)
+                    .retrieve()
+                    .bodyToMono(ApiResponse.class)
+                    .map(apiResponse -> {
+                        // Cast the body to List<EpisodeModel>
+                        Object body = apiResponse.getBody();
+                        if (body instanceof List<?> list) {
+                            return (List<EpisodeModel>) list;
+                        }
+                        return Collections.<EpisodeModel>emptyList();
+                    });
+
+            return responseMono.block(); // blocking here for simplicity
+        } catch (Exception e) {
+            // Log and return empty list if the call fails
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
     }
 }

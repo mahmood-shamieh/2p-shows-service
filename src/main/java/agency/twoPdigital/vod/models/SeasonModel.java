@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Builder
@@ -30,6 +31,7 @@ public class SeasonModel {
     @NotNull(message = "Activated flag is required")
     private Boolean activated ;
 
+    private List<EpisodeModel> episodeList;
     private LocalDateTime createdAt;
 
     private LocalDateTime updatedAt;
